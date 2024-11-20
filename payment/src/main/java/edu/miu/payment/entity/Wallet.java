@@ -1,9 +1,10 @@
-package edu.miu.report.entity;
+package edu.miu.payment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "wallets")
 @Data
+@NoArgsConstructor
 public class Wallet {
 
     @Id
@@ -33,4 +35,7 @@ public class Wallet {
     @JsonIgnore
     private List<Transaction> transactions;
 
+    public Wallet(Long walletId) {
+        this.walletId = walletId;
+    }
 }

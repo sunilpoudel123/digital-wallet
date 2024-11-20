@@ -1,6 +1,5 @@
-package edu.miu.report.entity;
+package edu.miu.payment.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -18,7 +17,6 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "wallet_id", nullable = false)
-    @JsonManagedReference
     private Wallet wallet;
 
     @Enumerated(EnumType.STRING)

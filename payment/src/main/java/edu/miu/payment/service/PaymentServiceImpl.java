@@ -1,61 +1,61 @@
 package edu.miu.payment.service;
 
+import edu.miu.payment.dto.MobileTopupRequest;
+import edu.miu.payment.dto.PaymentMethod;
 import edu.miu.payment.dto.PaymentRequest;
-import edu.miu.payment.entity.Payment;
-import edu.miu.payment.repository.PaymentRepository;
+import edu.miu.payment.dto.PaymentStatus;
+import edu.miu.payment.entity.Transaction;
+import edu.miu.payment.entity.TransactionType;
+import edu.miu.payment.entity.Wallet;
+import edu.miu.payment.repository.PaymentTransactionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.transaction.Transactional;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentRepository paymentRepository;
+    private final PaymentTransactionRepository paymentTransactionRepository;
     private final RestTemplate restTemplate;
 
     @Autowired
-    public PaymentServiceImpl(PaymentRepository paymentRepository, RestTemplate restTemplate) {
-        this.paymentRepository = paymentRepository;
+    public PaymentServiceImpl(PaymentTransactionRepository paymentTransactionRepository, RestTemplate restTemplate) {
+        this.paymentTransactionRepository = paymentTransactionRepository;
         this.restTemplate = restTemplate;
     }
 
     @Override
     @Transactional
-    public Payment initiatePayment(PaymentRequest paymentRequest) {
-        // Step 1: Validate Wallet Balance (assuming wallet microservice endpoint /api/wallets/{walletId}/balance)
-        String walletServiceUrl = "http://WALLET-SERVICE/api/wallets/" + paymentRequest.getSourceWalletId() + "/balance";
-        BigDecimal currentBalance = restTemplate.getForObject(walletServiceUrl, BigDecimal.class);
+    public Transaction initiatePayment(PaymentRequest paymentRequest) {
 
-        if (currentBalance.compareTo(paymentRequest.getAmount()) < 0) {
-            throw new IllegalArgumentException("Insufficient balance in source wallet.");
-        }
+        System.out.println("validation of payment request: ");
 
-        // Step 2: Deduct Balance from Source Wallet
-        // Assuming a PUT /api/wallets/{walletId}/withdraw endpoint exists in the Wallet Service
-        String withdrawUrl = "http://WALLET-SERVICE/api/wallets/" + paymentRequest.getSourceWalletId() + "/withdraw";
-        restTemplate.put(withdrawUrl, paymentRequest.getAmount());
-
-        // Step 3: Add Balance to Destination Wallet
-        String depositUrl = "http://WALLET-SERVICE/api/wallets/" + paymentRequest.getDestinationWalletId() + "/deposit";
-        restTemplate.put(depositUrl, paymentRequest.getAmount());
-
-        // Step 4: Save Payment Record
-        Payment payment = new Payment();
-        payment.setSourceWalletId(paymentRequest.getSourceWalletId());
-        payment.setDestinationWalletId(paymentRequest.getDestinationWalletId());
+        Transaction payment = new Transaction();
+        payment.setWallet(new Wallet(paymentRequest.getSourceWalletId()));
         payment.setAmount(paymentRequest.getAmount());
-        payment.setStatus("SUCCESS");
+        payment.setStatus(TransactionType.TRANSFER.name());
         payment.setCreatedAt(LocalDateTime.now());
 
-        return paymentRepository.save(payment);
+        return paymentTransactionRepository.save(payment);
     }
 
     @Override
-    public Payment getPaymentStatus(Long paymentId) {
-        return paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("Payment not found"));
+    public Transaction initiateMobileTopup(MobileTopupRequest mobileTopupRequest) {
+        Transaction payment = new Transaction();
+        payment.setWallet(new Wallet(mobileTopupRequest.getWalletId()));
+        payment.setAmount(mobileTopupRequest.getAmount());
+        payment.setDescription(PaymentMethod.MOBILE_TOPUP.name());
+        payment.setStatus(PaymentStatus.INITIATED.name());
+        payment.setCreatedAt(LocalDateTime.now());
+        payment.setTransactionType(TransactionType.TRANSFER);
+        return paymentTransactionRepository.save(payment);
+    }
+
+    @Override
+    public Transaction getPaymentStatus(Long paymentId) {
+        return paymentTransactionRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("Payment not found"));
     }
 }

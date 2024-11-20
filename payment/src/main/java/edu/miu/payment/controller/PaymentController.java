@@ -1,7 +1,8 @@
 package edu.miu.payment.controller;
 
+import edu.miu.payment.dto.MobileTopupRequest;
 import edu.miu.payment.dto.PaymentRequest;
-import edu.miu.payment.entity.Payment;
+import edu.miu.payment.entity.Transaction;
 import edu.miu.payment.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,14 +21,20 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<Payment> initiatePayment(@RequestBody PaymentRequest paymentRequest) {
-        Payment payment = paymentService.initiatePayment(paymentRequest);
+    public ResponseEntity<Transaction> initiatePayment(@RequestBody PaymentRequest paymentRequest) {
+        Transaction payment = paymentService.initiatePayment(paymentRequest);
         return new ResponseEntity<>(payment, HttpStatus.CREATED);
     }
 
     @GetMapping("/{paymentId}")
-    public ResponseEntity<Payment> getPaymentStatus(@PathVariable Long paymentId) {
-        Payment payment = paymentService.getPaymentStatus(paymentId);
+    public ResponseEntity<Transaction> getPaymentStatus(@PathVariable Long paymentId) {
+        Transaction payment = paymentService.getPaymentStatus(paymentId);
         return ResponseEntity.ok(payment);
+    }
+
+    @PostMapping("/topup")
+    public ResponseEntity<Transaction> initiateMobileTopup(@RequestBody MobileTopupRequest mobileTopupRequest) {
+        Transaction payment = paymentService.initiateMobileTopup(mobileTopupRequest);
+        return new ResponseEntity<>(payment, HttpStatus.CREATED);
     }
 }
