@@ -29,12 +29,12 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
-    @GetMapping("/wallet/{walletId}/transactions")
+    @GetMapping("/wallet/{walletUsername}/transactions")
     public ResponseEntity<List<Transaction>> getTransactionHistory(
-            @PathVariable Long walletId,
+            @PathVariable String walletUsername,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        List<Transaction> transactions = reportService.getTransactionHistory(walletId, startDate, endDate);
+        List<Transaction> transactions = reportService.getTransactionHistory(walletUsername, startDate, endDate);
         return ResponseEntity.ok(transactions);
     }
 }

@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ReportRequest {
-    private Long walletId;
+    private String walletUsername;
     private String reportType;
     private String startDate;
     private String endDate;

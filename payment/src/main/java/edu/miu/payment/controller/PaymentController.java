@@ -20,12 +20,6 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping
-    public ResponseEntity<Transaction> initiatePayment(@RequestBody PaymentRequest paymentRequest) {
-        Transaction payment = paymentService.initiatePayment(paymentRequest);
-        return new ResponseEntity<>(payment, HttpStatus.CREATED);
-    }
-
     @GetMapping("/{paymentId}")
     public ResponseEntity<Transaction> getPaymentStatus(@PathVariable Long paymentId) {
         Transaction payment = paymentService.getPaymentStatus(paymentId);
@@ -33,8 +27,11 @@ public class PaymentController {
     }
 
     @PostMapping("/topup")
-    public ResponseEntity<Transaction> initiateMobileTopup(@RequestBody MobileTopupRequest mobileTopupRequest) {
-        Transaction payment = paymentService.initiateMobileTopup(mobileTopupRequest);
-        return new ResponseEntity<>(payment, HttpStatus.CREATED);
+    public ResponseEntity<Object> initiateMobileTopup(@RequestBody MobileTopupRequest mobileTopupRequest) {
+        Transaction transaction = paymentService.initiateMobileTopup(mobileTopupRequest);
+        if (transaction == null) {
+            return new ResponseEntity<>("Invalid request: Wallet not found", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(transaction, HttpStatus.CREATED);
     }
 }

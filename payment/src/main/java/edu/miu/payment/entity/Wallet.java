@@ -30,6 +30,8 @@ public class Wallet {
 
     private LocalDateTime updatedAt;
 
+    private String username;
+
     @OneToMany(mappedBy = "wallet", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonBackReference
     @JsonIgnore

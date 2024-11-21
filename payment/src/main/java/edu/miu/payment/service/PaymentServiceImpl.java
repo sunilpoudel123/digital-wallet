@@ -8,44 +8,39 @@ import edu.miu.payment.entity.Transaction;
 import edu.miu.payment.entity.TransactionType;
 import edu.miu.payment.entity.Wallet;
 import edu.miu.payment.repository.PaymentTransactionRepository;
+import edu.miu.payment.repository.WalletRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentTransactionRepository paymentTransactionRepository;
-    private final RestTemplate restTemplate;
+    private final WalletRepository walletRepository;
 
     @Autowired
-    public PaymentServiceImpl(PaymentTransactionRepository paymentTransactionRepository, RestTemplate restTemplate) {
+    public PaymentServiceImpl(PaymentTransactionRepository paymentTransactionRepository, WalletRepository walletRepository) {
         this.paymentTransactionRepository = paymentTransactionRepository;
-        this.restTemplate = restTemplate;
-    }
-
-    @Override
-    @Transactional
-    public Transaction initiatePayment(PaymentRequest paymentRequest) {
-
-        System.out.println("validation of payment request: ");
-
-        Transaction payment = new Transaction();
-        payment.setWallet(new Wallet(paymentRequest.getSourceWalletId()));
-        payment.setAmount(paymentRequest.getAmount());
-        payment.setStatus(TransactionType.TRANSFER.name());
-        payment.setCreatedAt(LocalDateTime.now());
-
-        return paymentTransactionRepository.save(payment);
+        this.walletRepository = walletRepository;
     }
 
     @Override
     public Transaction initiateMobileTopup(MobileTopupRequest mobileTopupRequest) {
+        System.out.println("validation of payment request: ");
+
+        Optional<Wallet> wallet = walletRepository.findByUsername(mobileTopupRequest.getWalletUsername());
+        if (!wallet.isPresent()) {
+            System.out.println("invalid request");
+            return null;
+        }
+
         Transaction payment = new Transaction();
-        payment.setWallet(new Wallet(mobileTopupRequest.getWalletId()));
+        payment.setWallet(wallet.get());
         payment.setAmount(mobileTopupRequest.getAmount());
         payment.setDescription(PaymentMethod.MOBILE_TOPUP.name());
         payment.setStatus(PaymentStatus.INITIATED.name());

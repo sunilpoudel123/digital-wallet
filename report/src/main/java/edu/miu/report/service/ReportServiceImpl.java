@@ -22,13 +22,14 @@ public class ReportServiceImpl implements ReportService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime startDateTime = LocalDate.parse(request.getStartDate(), formatter).atStartOfDay();
         LocalDateTime endDateTime = LocalDate.parse(request.getEndDate(), formatter).atTime(23, 59, 59);
-        return reportRepository.findByWalletIdAndDateRange(request.getWalletId(), startDateTime, endDateTime);
+        return reportRepository.findByWalletIdAndDateRange(request.getWalletUsername(), startDateTime, endDateTime);
     }
 
     @Override
-    public List<Transaction> getTransactionHistory(Long walletId, LocalDate startDate, LocalDate endDate) {
+    public List<Transaction> getTransactionHistory(String username, LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-        return reportRepository.findByWalletIdAndDateRange(walletId, startDateTime, endDateTime);
+        return reportRepository.findByWalletIdAndDateRange(username, startDateTime, endDateTime);
     }
+
 }

@@ -19,7 +19,6 @@ public class WalletServiceImpl implements WalletService {
 
     private final KafkaProducerService kafkaProducerService;
 
-
     @Autowired
     public WalletServiceImpl(WalletRepository walletRepository, KafkaProducerService kafkaProducerService) {
         this.walletRepository = walletRepository;
@@ -30,8 +29,8 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     public Wallet createWallet(Wallet wallet) {
         wallet.setCreatedAt(LocalDateTime.now());
-//        wallet.setUser(tokenUser); // get User from token
         wallet.setUpdatedAt(LocalDateTime.now());
+        wallet.setUsername(wallet.getUsername());
         Wallet savedWallet = walletRepository.save(wallet);
         kafkaProducerService.sendWalletCreationMessage("New Wallet Created: " + savedWallet);
         return wallet;

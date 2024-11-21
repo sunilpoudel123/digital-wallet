@@ -1,5 +1,6 @@
 package edu.miu.payment.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,10 +14,11 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long transactionId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "wallet_id", nullable = false)
+    @JsonManagedReference
     private Wallet wallet;
 
     @Enumerated(EnumType.STRING)
@@ -36,8 +38,8 @@ public class Transaction {
     @Override
     public String toString() {
         return "Transaction{" +
-                "transactionId=" + transactionId +
-                ", wallet=" + wallet +
+                "transactionId=" + id +
+                ", wallet=" + wallet.getWalletId() +
                 ", transactionType=" + transactionType +
                 ", amount=" + amount +
                 ", status='" + status + '\'' +

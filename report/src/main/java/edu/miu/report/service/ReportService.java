@@ -9,5 +9,5 @@ import java.util.List;
 public interface ReportService {
     List<Transaction> generateReport(ReportRequest request);
 
-    List<Transaction> getTransactionHistory(Long walletId, LocalDate startDate, LocalDate endDate);
+    List<Transaction> getTransactionHistory(String username,  LocalDate startDate, LocalDate endDate);
 }

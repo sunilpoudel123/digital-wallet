@@ -10,9 +10,8 @@ import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Transaction, Long> {
 
-    @Query("SELECT t FROM Transaction t WHERE t.wallet.walletId = :walletId AND t.createdAt BETWEEN :startDate AND :endDate")
-    List<Transaction> findByWalletIdAndDateRange(Long walletId, LocalDateTime startDate, LocalDateTime endDate);
-
+    @Query("SELECT t FROM Transaction t WHERE t.wallet.username = :walletUsername AND t.createdAt BETWEEN :startDate AND :endDate")
+    List<Transaction> findByWalletIdAndDateRange(String walletUsername, LocalDateTime startDate, LocalDateTime endDate);
 
 
 }
