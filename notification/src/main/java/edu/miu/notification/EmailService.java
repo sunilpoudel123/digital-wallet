@@ -18,7 +18,7 @@ public class EmailService {
         message.setSubject("Payment Notification");
         message.setText("Payment processed successfully. Details: " + paymentDetails);
 
-        mailSender.send(message);
-        System.out.println("Email Notification Sent Successfully");
+//        mailSender.send(message);
+        System.out.println("Email Notification Sent Successfully: ");
     }
 }

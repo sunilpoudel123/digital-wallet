@@ -10,10 +10,10 @@ public class NotificationListener {
     @Autowired
     private EmailService emailService;
 
-    @KafkaListener(topics = "payment_topic", groupId = "notification_group")
-    public void paymentListen(String toEmail, String message) {
+    @KafkaListener(topics = "wallet_creation_topic", groupId = "notification_group")
+    public void walletListen(String toEmail, String message) {
 
-        System.out.println("Received Payment Event: " + message);
+        System.out.println("Received Wallet Event: " + message);
         emailService.sendPaymentNotification(toEmail, message);
     }
 }
