@@ -16,6 +16,7 @@
         <module>report</module>
         <module>notification</module>
         <module>user</module>
+        <module>api-gateway</module>
     </modules>
 
     <dependencyManagement>
