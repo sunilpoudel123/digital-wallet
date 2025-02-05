@@ -18,11 +18,13 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
 
     private final KafkaProducerService kafkaProducerService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public WalletServiceImpl(WalletRepository walletRepository, KafkaProducerService kafkaProducerService) {
+    public WalletServiceImpl(WalletRepository walletRepository, KafkaProducerService kafkaProducerService, TransactionService transactionService) {
         this.walletRepository = walletRepository;
         this.kafkaProducerService = kafkaProducerService;
+        this.transactionService = transactionService;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class WalletServiceImpl implements WalletService {
 
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new IllegalArgumentException("Wallet not found."));
-
+        transactionService.doTransaction(wallet, amount, "Add funds");
         wallet.setBalance(wallet.getBalance().add(amount));
         return walletRepository.save(wallet);
     }
