@@ -1,0 +1,118 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: microservices_db
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  api-gateway:
+    image: api-gateway:latest
+    container_name: api_gateway
+    depends_on:
+      - user-service
+      - wallet-service
+      - payment-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  cloud-config:
+    image: cloud-config:latest
+    container_name: cloud_config
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8888:8888"
+    networks:
+      - app-network
+
+  notification-service:
+    image: notification-service:latest
+    container_name: notification_service
+    depends_on:
+      - cloud-config
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+
+  payment-service:
+    image: payment-service:latest
+    container_name: payment_service
+    depends_on:
+      - mysql
+      - cloud-config
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/microservices_db
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_password
+    ports:
+      - "8082:8082"
+    networks:
+      - app-network
+
+  report-service:
+    image: report-service:latest
+    container_name: report_service
+    depends_on:
+      - cloud-config
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8083:8083"
+    networks:
+      - app-network
+
+  user-service:
+    image: user-service:latest
+    container_name: user_service
+    depends_on:
+      - mysql
+      - cloud-config
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/microservices_db
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_password
+    ports:
+      - "8084:8084"
+    networks:
+      - app-network
+
+  wallet-service:
+    image: wallet-service:latest
+    container_name: wallet_service
+    depends_on:
+      - mysql
+      - cloud-config
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/microservices_db
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_password
+    ports:
+      - "8085:8085"
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:

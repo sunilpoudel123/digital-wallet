@@ -1,0 +1,43 @@
+wallet:
+  service:
+    url: http://localhost:8080/api/wallets
+
+server:
+  port: 8081
+
+spring:
+  autoconfigure:
+    exclude: org.springdoc.webmvc.ui.SwaggerConfig
+  webmvc:
+    enabled: true
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/digital_wallet
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    org.springframework: INFO
+    com.example.payment: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

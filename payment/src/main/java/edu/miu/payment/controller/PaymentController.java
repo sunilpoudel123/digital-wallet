@@ -4,6 +4,7 @@ import edu.miu.payment.dto.MobileTopupRequest;
 import edu.miu.payment.dto.PaymentRequest;
 import edu.miu.payment.entity.Transaction;
 import edu.miu.payment.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class PaymentController {
         return ResponseEntity.ok(payment);
     }
 
+    @Operation(summary = "Returns a Hello World message")
     @PostMapping("/topup")
     public ResponseEntity<Object> initiateMobileTopup(@RequestBody MobileTopupRequest mobileTopupRequest) {
         Transaction transaction = paymentService.initiateMobileTopup(mobileTopupRequest);

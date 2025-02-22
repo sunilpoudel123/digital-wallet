@@ -1,9 +1,13 @@
-package edu.miu.notification;
+package edu.miu.cloudconfig;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class NotificationApplicationTests {
+class CloudConfigApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
 
 }

@@ -32,7 +32,7 @@ public class Wallet {
 
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "wallet", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions;
 
 }

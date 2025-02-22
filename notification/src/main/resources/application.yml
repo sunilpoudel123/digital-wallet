@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: notification-server
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your_email@gmail.com
+    password: your_email_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/notification_db
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  config:
+    import: optional:configserver:http://localhost:8888/
+
+logging:
+  level:
+    org.springframework: INFO
+    com.example.payment: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+server:
+  port: 8083
+wallet:
+  service:
+    url: http://localhost:8080/api/wallets
+
+### Eureka
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka
+      instance:
+        prefer-ip-address: true
+
+### cloud config server
+
+
+
+
