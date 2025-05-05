@@ -9,6 +9,8 @@ import edu.miu.payment.entity.TransactionType;
 import edu.miu.payment.entity.Wallet;
 import edu.miu.payment.repository.PaymentTransactionRepository;
 import edu.miu.payment.repository.WalletRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,14 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @CircuitBreaker(name= "payment-service", fallbackMethod = "fallback")
+    @Retry(name = "payment-service")
     public Transaction initiateMobileTopup(MobileTopupRequest mobileTopupRequest) {
         System.out.println("validation of payment request: ");
 
         Optional<Wallet> wallet = walletRepository.findByUsername(mobileTopupRequest.getWalletUsername());
         if (!wallet.isPresent()) {
+
             System.out.println("invalid request");
             return null;
         }
@@ -47,6 +52,10 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setCreatedAt(LocalDateTime.now());
         payment.setTransactionType(TransactionType.TRANSFER);
         return paymentTransactionRepository.save(payment);
+    }
+
+    public String fallback(Throwable t){
+        return "fall back due to" + t.getMessage();
     }
 
     @Override
