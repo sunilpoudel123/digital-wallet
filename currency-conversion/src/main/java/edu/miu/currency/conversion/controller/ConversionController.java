@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/convert")
-public class ConversationController {
+public class ConversionController {
 
     @Autowired
     private ConversionService conversionService;
