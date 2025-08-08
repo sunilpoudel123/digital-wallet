@@ -21,7 +21,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
   kafka:
     bootstrap-servers: localhost:9092
     producer:
@@ -34,10 +34,25 @@ spring:
 logging:
   level:
     org.springframework: INFO
-    com.example.payment: DEBUG
+    edu.miu.payment: DEBUG
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      payment-service:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+  retry:
+    instances:
+      payment-service:
+#        max-retry-attempts: 3
+        wait-duration: 500

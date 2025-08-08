@@ -21,6 +21,7 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
+    //todo add amazon cognito based auth system during payment
     @GetMapping("/{paymentId}")
     public ResponseEntity<Transaction> getPaymentStatus(@PathVariable Long paymentId) {
         Transaction payment = paymentService.getPaymentStatus(paymentId);
