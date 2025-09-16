@@ -15,7 +15,7 @@
         <module>payment</module>
         <module>report</module>
         <module>notification</module>
-        <module>user</module>
+        <module>authorization-server</module>
         <module>api-gateway</module>
     </modules>
 
