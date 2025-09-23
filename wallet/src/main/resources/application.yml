@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: wallet
+  datasource:
+    url: jdbc:mysql://localhost:3306/digital_wallet?useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false
+    properties:
+      hibernate.format_sql: false
+  kafka:
+    consumer:
+      properties:
+        session:
+          timeout:
+            ms: 30000
+        max:
+          poll:
+            interval:
+              ms: 300000
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8090/oauth2/jwks
+      client:
+        registration:
+          my-authorization-server:
+            
+            client-id: client
+            client-secret: secret
+            authorization-grant-type: client_credentials
+            redirect-uri: "{baseUrl}/login/oauth2/code/my-authorization-server"
+            scope: openid, profile, email
+        provider:
+          my-authorization-server:
+            authorization-uri: http://localhost:8090/auth/authorize
+            token-uri: http://localhost:8090/auth/token
+            user-info-uri: http://localhost:8090/user
+
+server:
+  port: 8087
+logging:
+  level:
+    org.apache.kafka: ERROR
+    org.apache.kafka.clients.NetworkClient: ERROR
+
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+
+#security:
+#  oauth2:
+#    client:
+#      accessTokenUri: http://localhost:8090/auth/token
+#      userAuthorizationUri: http://localhost:8090/auth/authorize
+#      clientId: client
+#      clientSecret: secret
+#      grant-type: client_credentials
+#    resource:
+#      userInfoUri: http://localhost:8090/user

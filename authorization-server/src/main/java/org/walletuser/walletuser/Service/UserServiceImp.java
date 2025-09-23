@@ -19,7 +19,7 @@ public class UserServiceImp implements UserService {
     @Override
     public ResponseEntity updateUser(User updatedUser) {
 
-        User existingUser = userRepository.findByUsername(updatedUser.getUsername());
+        User existingUser = userRepository.findByUsername(updatedUser.getUsername()).get();
 
         // Update only modifiable fields
         if (updatedUser.getFirstName() != null) {
@@ -58,42 +58,4 @@ public class UserServiceImp implements UserService {
     private UserDTO toUserDTO(User user) {
         return new UserDTO(user.getUsername());
     }
-
-//    public ResponseEntity updateAdmin(User updatedAdmin) {
-//
-//        User existingAdmin = userRepository.findByUsername(updatedAdmin.getUsername());
-//
-//        // Update only modifiable fields
-//        if (updatedAdmin.getFirstName() != null) {
-//            existingAdmin.setFirstName(updatedAdmin.getFirstName());
-//        }
-//
-//        if (updatedAdmin.getLastName() != null) {
-//            existingAdmin.setLastName(updatedAdmin.getLastName());
-//        }
-//
-//        if (updatedAdmin.getEmail() != null) {
-//            existingAdmin.setEmail(updatedAdmin.getEmail());
-//        }
-//
-//        if (updatedAdmin.getPhone() != null) {
-//            existingAdmin.setPhone(updatedAdmin.getPhone());
-//        }
-//
-//        if (updatedAdmin.getAddress() != null) {
-//            existingAdmin.setAddress(updatedAdmin.getAddress());
-//        }
-//
-//        // Update the `updatedAt` timestamp
-//        existingAdmin.setUpdatedAt(LocalDateTime.now());
-//
-//        userRepository.save(existingAdmin);
-//
-//        // Map the User object to UserDTO
-//        UserDTO userDTO = toUserDTO(existingAdmin);
-//        // Create a custom response
-//        ApiResponse<UserDTO> response = new ApiResponse<>("Admin updated successfully", userDTO);
-//
-//        return ResponseEntity.ok(response);
-//    }
 }

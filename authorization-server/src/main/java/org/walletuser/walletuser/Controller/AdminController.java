@@ -1,67 +1,67 @@
 package org.walletuser.walletuser.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.walletuser.walletuser.Model.User;
-import org.walletuser.walletuser.Repository.UserRepository;
 import org.walletuser.walletuser.Service.AdminService;
-import org.walletuser.walletuser.Service.UserService;
+import org.walletuser.walletuser.dto.UserDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @RestController
-@RequestMapping("admin")
+@RequestMapping("/api/v1/admin")
 public class AdminController {
 
-    @Autowired
-    private AdminService adminService;
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+    private final AdminService adminService;
 
-    @GetMapping("/{role}/users")
-    public ResponseEntity<List<User>> getUsersWithRole(@PathVariable String role) {
-
-        List<User> users = adminService.getUsersByRole(role);
-
-        if (users.isEmpty()) {
-            return ResponseEntity.noContent().build(); // HTTP 204 if no users are found
-        }
-
-        return ResponseEntity.ok(users); // HTTP 200 with the list of users
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
 
-    @PostMapping("/updateadmin")
-    public ResponseEntity updateAdmin(@RequestBody User user) {
-
-        return adminService.updateAdmin(user);
+    @GetMapping("/users")
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getUsersWithRole(@RequestParam String role) {
+        return adminService.getUsersByRole(role);
     }
 
-    @PutMapping("/activeuser/{userId}")
-    public ResponseEntity<?> updateUserEnabled(@PathVariable Long userId) {
+    @PutMapping("/users/{userId}/update")
+    public ResponseEntity<UserDTO> updateAdmin(@PathVariable Long userId, @RequestBody User userDetails) {
         try {
-            adminService.updateUserEnabled(userId);
+            UserDTO updatedUser = adminService.updateAdmin(userId, userDetails);
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalArgumentException e) {
+            logger.error("Error updating user: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PatchMapping("/users/{userId}/active")
+    public ResponseEntity<String> updateUserEnabled(@PathVariable Long userId, @RequestParam boolean enabled) {
+        try {
+            adminService.updateUserEnabledStatus(userId, enabled);
             return ResponseEntity.ok("User's enabled status updated successfully.");
         } catch (IllegalArgumentException e) {
+            logger.warn("Attempt to update enabled status for non-existent user with ID: {}", userId);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @GetMapping("/{role}/usersInRange")
-    public ResponseEntity<List<User>> getUsersByRoleAndDateRange(
-            @PathVariable String role,
-            @RequestParam("startDate") String startDate,
-            @RequestParam("endDate") String endDate
-    ) {
-        LocalDateTime start = LocalDateTime.parse(startDate);
-        LocalDateTime end = LocalDateTime.parse(endDate);
+    @GetMapping("/users/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getUsersByRoleAndDateRange(
+            @RequestParam String role,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
 
-        List<User> users = adminService.getUsersByRoleAndDateRange(role, start, end);
-
-        if (users.isEmpty()) {
-            return ResponseEntity.noContent().build(); // HTTP 204 if no users are found
-        }
-
-        return ResponseEntity.ok(users); // HTTP 200 with the list of users
+        return adminService.getUsersByRoleAndDateRange(role, startDate, endDate);
     }
 }

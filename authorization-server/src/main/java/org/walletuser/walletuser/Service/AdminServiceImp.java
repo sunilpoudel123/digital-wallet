@@ -1,77 +1,59 @@
 package org.walletuser.walletuser.Service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.walletuser.walletuser.ApiResponse;
+import org.springframework.transaction.annotation.Transactional;
 import org.walletuser.walletuser.Model.User;
 import org.walletuser.walletuser.Repository.AdminRepository;
 import org.walletuser.walletuser.dto.UserDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 @Service
 public class AdminServiceImp implements AdminService {
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
 
-    private UserDTO toUserDTO(User user) {
-
-        return new UserDTO(user.getUsername());
+    public AdminServiceImp(AdminRepository adminRepository) {
+        this.adminRepository = adminRepository;
     }
 
-    public ResponseEntity updateAdmin(User updatedAdmin) {
-
-        User existingAdmin = adminRepository.findByUsername(updatedAdmin.getUsername());
-
-        // Update only modifiable fields
-        if (updatedAdmin.getFirstName() != null) {
-            existingAdmin.setFirstName(updatedAdmin.getFirstName());
-        }
-
-        if (updatedAdmin.getLastName() != null) {
-            existingAdmin.setLastName(updatedAdmin.getLastName());
-        }
-
-        if (updatedAdmin.getEmail() != null) {
-            existingAdmin.setEmail(updatedAdmin.getEmail());
-        }
-
-        if (updatedAdmin.getPhone() != null) {
-            existingAdmin.setPhone(updatedAdmin.getPhone());
-        }
-
-        if (updatedAdmin.getAddress() != null) {
-            existingAdmin.setAddress(updatedAdmin.getAddress());
-        }
-
-        // Update the `updatedAt` timestamp
+    @Transactional
+    public UserDTO updateAdmin(Long userId, User updatedAdminDetails) {
+        User existingAdmin = adminRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Admin with ID " + userId + " not found."));
+        updateUserFields(existingAdmin, updatedAdminDetails);
         existingAdmin.setUpdatedAt(LocalDateTime.now());
+        User savedUser = adminRepository.save(existingAdmin);
+        return toUserDTO(savedUser);
+    }
 
-        adminRepository.save(existingAdmin);
-
-        // Map the User object to UserDTO
-        UserDTO userDTO = toUserDTO(existingAdmin);
-        // Create a custom response
-        ApiResponse<UserDTO> response = new ApiResponse<>("Admin updated successfully", userDTO);
-
-        return ResponseEntity.ok(response);
+    private void updateUserFields(User existingUser, User updatedDetails) {
+        if (updatedDetails.getFirstName() != null) {
+            existingUser.setFirstName(updatedDetails.getFirstName());
+        }
+        if (updatedDetails.getLastName() != null) {
+            existingUser.setLastName(updatedDetails.getLastName());
+        }
+        if (updatedDetails.getEmail() != null) {
+            existingUser.setEmail(updatedDetails.getEmail());
+        }
+        if (updatedDetails.getPhone() != null) {
+            existingUser.setPhone(updatedDetails.getPhone());
+        }
+        if (updatedDetails.getAddress() != null) {
+            existingUser.setAddress(updatedDetails.getAddress());
+        }
     }
 
     @Override
-    public void updateUserEnabled(Long userId) {
-
-        Optional<User> optionalUser = adminRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setEnabled(!user.getEnabled()); // Set the 'enabled' field
-            adminRepository.save(user); // Save the updated user
-        } else {
-            throw new IllegalArgumentException("User with ID " + userId + " not found.");
-        }
+    @Transactional
+    public void updateUserEnabledStatus(Long userId, boolean enabled) {
+        User user = adminRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with ID " + userId + " not found."));
+        user.setEnabled(enabled);
+        adminRepository.save(user);
     }
 
     @Override
@@ -79,7 +61,12 @@ public class AdminServiceImp implements AdminService {
         return adminRepository.findByRole(role);
     }
 
+    @Override
     public List<User> getUsersByRoleAndDateRange(String role, LocalDateTime startDate, LocalDateTime endDate) {
         return adminRepository.findUsersByRoleAndCreatedAtBetween(role, startDate, endDate);
+    }
+
+    private UserDTO toUserDTO(User user) {
+        return new UserDTO(user.getUsername(), user.getEmail());
     }
 }

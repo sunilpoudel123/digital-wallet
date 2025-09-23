@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: wallet-user
+  datasource:
+    url: jdbc:mysql://localhost:3306/authorization_server
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  main:
+    allow-bean-definition-overriding: true
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+debug: false
+
+server:
+  port: 8090
