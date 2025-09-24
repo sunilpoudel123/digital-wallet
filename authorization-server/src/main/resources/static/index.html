@@ -1,0 +1,112 @@
+<!-- jQuery and js-cookie -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/webjars/js-cookie/js.cookie.js"></script>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+<!-- Error container -->
+<div class="container mt-3">
+    <div class="alert alert-danger error d-none"></div>
+</div>
+
+<!-- Unauthenticated -->
+<div class="container unauthenticated mt-4">
+    <h4>Login with</h4>
+    <div class="mb-2">
+        <a href="/oauth2/authorization/github" class="btn btn-dark btn-sm">GitHub</a>
+    </div>
+    <div>
+        <a href="/oauth2/authorization/google" class="btn btn-danger btn-sm">Google</a>
+    </div>
+</div>
+
+<!-- Authenticated -->
+<div class="container authenticated mt-4 d-none">
+    <div class="card shadow-sm p-3" style="max-width: 400px;">
+        <div class="d-flex align-items-center mb-3">
+            <img id="user-avatar" src="https://via.placeholder.com/50" class="rounded-circle me-3" width="50" height="50" alt="avatar">
+            <div>
+                <h5 class="mb-1" id="user">User Name</h5>
+                <small class="text-muted" id="user-email">user@example.com</small>
+            </div>
+        </div>
+        <div>
+            <button id="logoutBtn" class="btn btn-danger btn-sm w-100">Logout</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = document.querySelector('meta[name="_csrf"]').content;
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+
+    $(document).ready(function() {
+
+        // Setup CSRF for all AJAX requests
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (/^(POST|PUT|DELETE)$/i.test(settings.type) &&
+                    !/^https?:.*/.test(settings.url)) {
+                    xhr.setRequestHeader("X-XSRF-TOKEN", Cookies.get('XSRF-TOKEN'));
+                }
+            }
+        });
+
+        // Load current user
+        $.get("/user")
+            .done(function(data) {
+                if (data && data.name) {
+                    $("#user").text(data.name);
+                    $("#user-email").text(data.email || '');
+                    $("#user-avatar").attr("src", data.avatar || 'https://via.placeholder.com/50');
+                    $(".unauthenticated").hide();
+                    $(".authenticated").removeClass("d-none");
+                } else {
+                    $(".unauthenticated").show();
+                    $(".authenticated").addClass("d-none");
+                }
+            })
+            .fail(function() {
+                $(".unauthenticated").show();
+                $(".authenticated").addClass("d-none");
+            });
+
+        // Load error if exists
+        function showError(message) {
+            if (message) {
+                $(".error").text(message).removeClass("d-none");
+            } else {
+                $(".error").addClass("d-none").text('');
+            }
+        }
+
+
+        // Logout
+        $("#logoutBtn").click(function() {
+            $("#logoutBtn").click(function() {
+                const token = Cookies.get('XSRF-TOKEN');
+                if (!token) {
+                    alert("CSRF token not found!");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/logout',
+                    type: 'POST',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(header, token);
+                        xhr.setRequestHeader('X-XSRF-TOKEN', token);
+                    },
+                    success: function() {
+                        $(".authenticated").addClass("d-none");
+                        $(".unauthenticated").show();
+                    },
+                    error: function() {
+                        alert("Logout failed: 403");
+                    }
+                });
+            });
+        });
+
+    });
+</script>

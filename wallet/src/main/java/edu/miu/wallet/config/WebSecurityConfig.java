@@ -14,37 +14,37 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebSecurityConfig {
 
-    @Bean
-    WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
-        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
-                new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
-        oauth2.setDefaultClientRegistrationId("client-registration-id");
+//    @Bean
+//    WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
+//        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
+//                new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+//        oauth2.setDefaultClientRegistrationId("client-registration-id");
+//
+//        return WebClient.builder()
+//                .apply(oauth2.oauth2Configuration())
+//                .build();
+//    }
 
-        return WebClient.builder()
-                .apply(oauth2.oauth2Configuration())
-                .build();
-    }
-
-    @Bean
-    public OAuth2AuthorizedClientManager authorizedClientManager(
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository authorizedClientRepository) {
-
-        // Build a provider that supports various grant types
-        OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .authorizationCode()
-                        .refreshToken()
-                        .clientCredentials()
-                        .password()
-                        .build();
-
-        // Create the default manager
-        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-                new DefaultOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository, authorizedClientRepository);
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
-    }
+//    @Bean
+//    public OAuth2AuthorizedClientManager authorizedClientManager(
+//            ClientRegistrationRepository clientRegistrationRepository,
+//            OAuth2AuthorizedClientRepository authorizedClientRepository) {
+//
+//        // Build a provider that supports various grant types
+//        OAuth2AuthorizedClientProvider authorizedClientProvider =
+//                OAuth2AuthorizedClientProviderBuilder.builder()
+//                        .authorizationCode()
+//                        .refreshToken()
+//                        .clientCredentials()
+//                        .password()
+//                        .build();
+//
+//        // Create the default manager
+//        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+//                new DefaultOAuth2AuthorizedClientManager(
+//                        clientRegistrationRepository, authorizedClientRepository);
+//        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+//
+//        return authorizedClientManager;
+//    }
 }

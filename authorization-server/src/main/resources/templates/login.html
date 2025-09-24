@@ -1,0 +1,77 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/webjars/js-cookie/js.cookie.js"></script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <title>Wallet Payment Authorization</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+  <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+  <style>
+    .btn-google {
+      background-color: #db4437;
+      color: white;
+    }
+    .btn-github {
+      background-color: #24292e;
+      color: white;
+    }
+    .btn-google:hover, .btn-github:hover {
+      opacity: 0.9;
+      color: white;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card shadow-lg rounded-3">
+        <div class="card-header text-center bg-primary text-white">
+          <h3>Wallet Payment System</h3>
+          <small>Authorization Portal</small>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" id="username" class="form-control" placeholder="Enter your username" required/>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" id="password" class="form-control" placeholder="Enter your password" required/>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe"/>
+              <label class="form-check-label" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Authorize</button>
+          </form>
+
+          <hr class="my-4">
+          <div class="text-center mb-3">Or sign in with</div>
+
+          <div class="d-grid gap-2">
+            <a href="/oauth2/authorization/google" class="btn btn-google">
+              <i class="bi bi-google"></i> Continue with Google
+            </a>
+            <a href="/oauth2/authorization/github" class="btn btn-github">
+              <i class="bi bi-github"></i> Continue with GitHub
+            </a>
+          </div>
+        </div>
+        <div class="card-footer text-center">
+          <a href="#">Forgot Password?</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</body>
+</html>

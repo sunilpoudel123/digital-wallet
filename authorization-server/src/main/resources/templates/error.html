@@ -1,0 +1,44 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/webjars/js-cookie/js.cookie.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .error-card {
+            max-width: 500px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="card error-card shadow-sm p-4 text-center">
+    <div class="card-body">
+        <h2 class="card-title text-danger mb-3">Oops! Something went wrong.</h2>
+        <p class="card-text" id="errorMessage">An unexpected error occurred.</p>
+        <hr>
+        <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+</div>
+<script>
+    // Try to load error message dynamically if passed by server
+    $(document).ready(function() {
+        $.get("/error")
+            .done(function(data) {
+                if (data) {
+                    $("#errorMessage").text(data);
+                }
+            });
+    });
+</script>
+</body>
+</html>
